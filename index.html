@@ -207,6 +207,17 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
       <tr><td>Sessions</td><td>Save/load full sessions (32 slots)</td></tr>
     </table>
   </div>
+
+  <h2>Scales View</h2>
+  <div class="box">
+    <p>Press <kbd>Scales</kbd> to lock the synth pads to one of 16 musical scales in any root note &mdash; both apply live, even mid-pattern, and are saved with the pattern.</p>
+    <table>
+      <tr><td>Top 2 rows (pads 1&ndash;16)</td><td><b>Root note</b> &mdash; piano-style layout: row 1 = black keys (pads 2,3,5,6,7 = C&#9839;, E&#9837;, F&#9839;, A&#9837;, B&#9837;), row 2 = white keys (pads 9&ndash;15 = C, D, E, F, G, A, B). Pads 1, 4, 8, 16 are always disabled (spacing for the black-key gaps).</td></tr>
+      <tr><td>Bottom 2 rows (pads 17&ndash;32)</td><td><b>Scale</b> &mdash; one pad per scale, in the fixed order listed in Reference &rarr; Scales.</td></tr>
+      <tr><td>Press <kbd>Note</kbd> to exit</td><td>Upper two rows of Note View now play the selected scale over two octaves (one octave if Chromatic, since it's all 12 notes)</td></tr>
+    </table>
+    <p class="dim">Notes outside the current scale are 'snapped' to the nearest in-scale note, including incoming external MIDI notes. Changing scale after recording a pattern re-interprets existing notes into the new scale rather than transposing them literally.</p>
+  </div>
 </section>
 
 <section class="tab" id="tab-synth">
@@ -286,6 +297,31 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
   <h3>Macros (8 knobs)</h3>
   <div class="box">
     <p>Each Macro knob can drive up to <b>4 simultaneous destinations</b> (A&ndash;D), each with its own <b>Start</b>/<b>End</b> range (which portion of the knob's 0&ndash;127 travel is used) and signed <b>Depth</b>. Macros use a bigger, separate destination catalogue than the Mod Matrix &mdash; 71 targets in total (index 0 = "No Destination"): every oscillator/mixer/filter/envelope/LFO/FX parameter individually, plus the ability to drive the <b>depth</b> of any of the 20 Mod Matrix slots directly (meta-modulation). This list isn't in Novation's published manuals; it was read directly out of the Novation Components web editor's Modulation-tab destination dropdown.</p>
+  </div>
+
+  <h3>Scales (16)</h3>
+  <div class="box">
+    <p>Selected in Scales View (see Workflow tab) &mdash; pads 17&ndash;32, in this fixed order. Notes shown for root note C; picking a different root note transposes the same interval pattern.</p>
+    <table>
+      <tr><th>Pad</th><th>Scale</th><th>Notes (root C)</th></tr>
+      <tr><td>17</td><td>Natural Minor</td><td>C, D, E&#9837;, F, G, A&#9837;, B&#9837;</td></tr>
+      <tr><td>18</td><td>Major</td><td>C, D, E, F, G, A, B</td></tr>
+      <tr><td>19</td><td>Dorian</td><td>C, D, E&#9837;, F, G, A, B&#9837;</td></tr>
+      <tr><td>20</td><td>Phrygian</td><td>C, C&#9839;, E&#9837;, F, G, A&#9837;, B&#9837;</td></tr>
+      <tr><td>21</td><td>Mixolydian</td><td>C, D, E, F, G, A, B&#9837;</td></tr>
+      <tr><td>22</td><td>Melodic Minor (ascending)</td><td>C, D, E&#9837;, F, G, A, B</td></tr>
+      <tr><td>23</td><td>Harmonic Minor</td><td>C, D, E&#9837;, F, G, A&#9837;, B</td></tr>
+      <tr><td>24</td><td>Bebop Dorian</td><td>C, D, E&#9837;, E, F, G, A, B&#9837;</td></tr>
+      <tr><td>25</td><td>Blues</td><td>C, E&#9837;, F, F&#9839;, G, B&#9837;</td></tr>
+      <tr><td>26</td><td>Minor Pentatonic</td><td>C, E&#9837;, F, G, B&#9837;</td></tr>
+      <tr><td>27</td><td>Hungarian Minor</td><td>C, D, E&#9837;, F&#9839;, G, A&#9837;, B</td></tr>
+      <tr><td>28</td><td>Ukrainian Dorian</td><td>C, D, E&#9837;, F&#9839;, G, A, B&#9837;</td></tr>
+      <tr><td>29</td><td>Marva</td><td>C, C&#9839;, E, F&#9839;, G, A, B</td></tr>
+      <tr><td>30</td><td>Todi</td><td>C, C&#9839;, E&#9837;, F&#9839;, G, A&#9837;, B</td></tr>
+      <tr><td>31</td><td>Whole Tone</td><td>C, D, E, F&#9839;, A&#9837;, B&#9837;</td></tr>
+      <tr><td>32</td><td>Chromatic</td><td>all 12 notes</td></tr>
+    </table>
+    <p class="dim">Root note (top 2 rows of Scales View, pads 1&ndash;16): black keys at pads 2, 3, 5, 6, 7 (C&#9839;, E&#9837;, F&#9839;, A&#9837;, B&#9837;); white keys at pads 9&ndash;15 (C, D, E, F, G, A, B). Pads 1, 4, 8, 16 are unused spacers.</p>
   </div>
 
   <h3>Patch metadata</h3>
