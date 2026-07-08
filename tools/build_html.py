@@ -35,6 +35,17 @@ def build_patch_card(p, idx):
     cat = p["category"]
     genre = p["genre"]
     voice = p["settings"]["polyphonyMode"]
+    slot_display = p.get("slotDisplay")
+    page = p.get("patchViewPage")
+    row = p.get("patchViewRow")
+    col = p.get("patchViewCol")
+    slot_badge = f"{slot_display:02d}" if slot_display else "??"
+    location_line = (
+        f"Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; "
+        f"Page {page}, pad <b>{row}.{col}</b>"
+        f"{' &mdash; press the non-lit Oct button to reach page 2 if needed' if page == 2 else ''}"
+        if slot_display else "Slot unknown"
+    )
     o1, o2 = p["osc1"], p["osc2"]
     mx = p["mixer"]
     filt = p["filter"]
@@ -74,13 +85,15 @@ def build_patch_card(p, idx):
         macro_rows = "<tr><td colspan='3' class='dim'>No macro routings assigned</td></tr>"
 
     return f"""
-  <details class="card" data-name="{name.lower()}" data-cat="{cat.lower()}" data-genre="{genre.lower()}">
+  <details class="card" data-name="{name.lower()}" data-cat="{cat.lower()}" data-genre="{genre.lower()}" data-voice="{voice.lower()}">
     <summary class="card-head">
+      <span class="p-num">{slot_badge}</span>
       <span class="p-name">{name}</span>
       <span class="p-tags"><span class="tag cat-{cat.replace(' ','').replace('/','')}">{cat}</span><span class="tag genre">{genre}</span><span class="tag voice">{voice}</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">{location_line}</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>{osc_summary(o1)}</p></div>
         <div class="blk"><h4>Osc 2</h4><p>{osc_summary(o2)}</p></div>
@@ -107,6 +120,10 @@ def build_patch_card(p, idx):
 patch_cards = "\n".join(build_patch_card(p, i) for i, p in enumerate(DATA["patches"]))
 categories = sorted(set(p["category"] for p in DATA["patches"]))
 cat_chips = "".join(f'<button class="chip" data-cat="{c.lower()}">{c}</button>' for c in categories)
+genres = sorted(set(p["genre"] for p in DATA["patches"]))
+genre_chips = "".join(f'<button class="chip" data-genre="{g.lower()}">{g}</button>' for g in genres)
+voices = sorted(set(p["settings"]["polyphonyMode"] for p in DATA["patches"]))
+voice_chips = "".join(f'<button class="chip" data-voice="{v.lower()}">{v}</button>' for v in voices)
 
 TAB_IDS = ["workflow", "patches", "synth", "about"]
 tabset_css = "\n".join(
@@ -150,6 +167,8 @@ header.top {{
 }}
 header.top .title {{ font-size:1.05em; font-weight:800; padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; }}
 header.top .title small {{ color:var(--dim); font-weight:400; font-size:0.7em; }}
+nav.tabs, .chips {{ scrollbar-width:none; -ms-overflow-style:none; }}
+nav.tabs::-webkit-scrollbar, .chips::-webkit-scrollbar {{ display:none; height:0; }}
 nav.tabs {{ display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; }}
 nav.tabs label {{
   flex:0 0 auto; background:var(--panel2); color:var(--dim); border:1px solid var(--line);
@@ -181,6 +200,7 @@ kbd {{
   flex:1; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px;
   color:var(--text); font-size:0.95em;
 }}
+.filter-label {{ font-size:0.72em; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em; margin:10px 0 4px; }}
 .chips {{ display:flex; gap:6px; overflow-x:auto; padding:4px 0 10px; }}
 .chip {{
   flex:0 0 auto; background:var(--panel); border:1px solid var(--line); color:var(--dim);
@@ -193,6 +213,10 @@ kbd {{
   display:flex; align-items:center; gap:8px; text-align:left; font-size:0.95em;
 }}
 .card-head::-webkit-details-marker {{ display:none; }}
+.p-num {{
+  flex:0 0 auto; font-family:ui-monospace,Menlo,monospace; font-size:0.78em; font-weight:700;
+  color:var(--bg); background:var(--accent2); border-radius:6px; padding:2px 6px; letter-spacing:0.02em;
+}}
 .card .p-name {{ font-weight:700; flex:1; }}
 .p-tags {{ display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }}
 .tag {{ font-size:0.68em; padding:2px 7px; border-radius:999px; background:var(--panel2); color:var(--dim); white-space:nowrap; }}
@@ -201,6 +225,8 @@ kbd {{
 .chev {{ color:var(--dim); transition:transform 0.15s; }}
 .card[open] .chev {{ transform:rotate(180deg); }}
 .card-body {{ padding:0 14px 14px; border-top:1px solid var(--line); }}
+.location-line {{ font-size:0.8em; color:var(--dim); margin:10px 0 0; }}
+.location-line kbd {{ font-size:0.95em; }}
 .grid2 {{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }}
 .blk p {{ font-size:0.83em; color:var(--dim); }}
 .blk h4 {{ margin-bottom:2px; }}
@@ -252,7 +278,7 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
     </table>
     <h3>Patch &amp; sound</h3>
     <table>
-      <tr><td><kbd>Shift</kbd>+<kbd>Synth 1</kbd> / <kbd>Synth 2</kbd></td><td>Open Patch View to change that synth's patch</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Synth 1</kbd> / <kbd>Synth 2</kbd></td><td>Open Patch View to change that synth's patch. Each pad = one of 64 patches: page 1 = patches 1&ndash;32, page 2 = patches 33&ndash;64. Press the non-lit Oct button to flip page. The Patches tab shows each patch's number for exactly this.</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Drum 1&ndash;4</kbd></td><td>Change patch for that drum track</td></tr>
       <tr><td><kbd>Shift</kbd>+ pad (in Patch View)</td><td>Disable audition/preview when browsing patches</td></tr>
     </table>
@@ -399,11 +425,21 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
 
 <section class="tab" id="tab-patches">
   <h2>Team Novation Ci &mdash; 64 synth patches</h2>
-  <p class="dim">Tap a patch to expand its full parameter set. This pack also ships {len(DATA['samples'])} one-shot samples and {len(DATA['sessions'])} demo sessions (not covered here &mdash; just audio/session data, nothing to decode).</p>
   <div class="search-row"><input id="search" type="search" placeholder="Search patch name&hellip;" autocomplete="off"></div>
+  <div class="filter-label">Category</div>
   <div class="chips" id="catChips">
     <button class="chip active" data-cat="all">All</button>
     {cat_chips}
+  </div>
+  <div class="filter-label">Genre</div>
+  <div class="chips" id="genreChips">
+    <button class="chip active" data-genre="all">All</button>
+    {genre_chips}
+  </div>
+  <div class="filter-label">Voice</div>
+  <div class="chips" id="voiceChips">
+    <button class="chip active" data-voice="all">All</button>
+    {voice_chips}
   </div>
   <div id="patchList">
   {patch_cards}
@@ -418,6 +454,11 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
     <p><b>Getting it into Safari on iPhone</b> (needed for Add to Home Screen): tapping an <code>.html</code> file in Files/Mail/AirDrop usually opens Apple's <b>Quick Look</b> preview, not Safari. From Quick Look, tap the <b>Share</b> icon (square with an arrow) and look for a <b>Safari</b> icon in the row of apps &mdash; tapping it opens the page properly in Safari. From there, tap <b>Share</b> &rarr; <b>Add to Home Screen</b> to launch it full-screen and fully offline afterwards.</p>
     <p>Patch data was reverse-engineered from the Novation Components web editor's client-side code and cross-validated byte-for-byte against Novation's official <i>Circuit Programmer's Reference Guide 1.3</i> (Synth Patch Format table, page 14&ndash;18).</p>
   </div>
+  <h3>Patches</h3>
+  <div class="box">
+    <p>Tap a patch to expand its full parameter set. This pack also ships {len(DATA['samples'])} one-shot samples and {len(DATA['sessions'])} demo sessions (not covered here &mdash; just audio/session data, nothing to decode).</p>
+    <p>The numbered badge on each patch (e.g. <span class="p-num" style="display:inline">01</span>) is its slot 1&ndash;64 in Patch View on the hardware &mdash; stays visible even when filtered, so you always know where to find it. See Workflow &rarr; Shift shortcuts &rarr; Patch &amp; sound for how Patch View is laid out.</p>
+  </div>
   <h3>Regenerating for another pack</h3>
   <div class="box"><p>This page is generated from a <code>.circuitpack</code> export (rename to <code>.zip</code> and unzip: <code>index.json</code> + <code>patches/*.syx</code>). The same decoder works for any Circuit (product 0x60) factory or user pack &mdash; only the embedded patch JSON below needs regenerating.</p></div>
 </section>
@@ -428,16 +469,21 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
 
 <script>
 const search = document.getElementById('search');
-const chips = document.querySelectorAll('#catChips .chip');
-let activeCat = 'all';
+
+// Each filter group: chip container id -> {{ dataKey: card.dataset key, active: current value }}
+const filterGroups = [
+  {{ id: 'catChips', key: 'cat' }},
+  {{ id: 'genreChips', key: 'genre' }},
+  {{ id: 'voiceChips', key: 'voice' }},
+].map(g => ({{ ...g, active: 'all', chips: document.querySelectorAll('#' + g.id + ' .chip') }}));
 
 function applyFilter() {{
   const q = search.value.trim().toLowerCase();
   let visible = 0;
   document.querySelectorAll('#patchList .card').forEach(card => {{
     const matchesText = card.dataset.name.includes(q);
-    const matchesCat = activeCat === 'all' || card.dataset.cat === activeCat;
-    const show = matchesText && matchesCat;
+    const matchesGroups = filterGroups.every(g => g.active === 'all' || card.dataset[g.key] === g.active);
+    const show = matchesText && matchesGroups;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   }});
@@ -445,12 +491,14 @@ function applyFilter() {{
 }}
 
 search.addEventListener('input', applyFilter);
-chips.forEach(chip => {{
-  chip.addEventListener('click', () => {{
-    chips.forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeCat = chip.dataset.cat;
-    applyFilter();
+filterGroups.forEach(group => {{
+  group.chips.forEach(chip => {{
+    chip.addEventListener('click', () => {{
+      group.chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      group.active = chip.dataset[group.key];
+      applyFilter();
+    }});
   }});
 }});
 </script>

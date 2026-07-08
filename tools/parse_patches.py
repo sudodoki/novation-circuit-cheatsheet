@@ -9,6 +9,7 @@ F0 00 20 29 01 60 00 00 00). Every field is exactly one raw 7-bit byte;
 "signed" fields store (actual_value + 64).
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -299,6 +300,27 @@ def main():
         decoded = parse_patch(raw, patch_name_hint=p["name"])
         decoded["_indexName"] = p["name"]
         decoded["_url"] = p["url"]
+
+        # patches/patch_N.syx: N is the actual Flash slot (0-63), i.e. the MIDI
+        # Program Change value that recalls this patch on either synth track
+        # ("Format of a Synth Patch (Bank) Sysex File" concatenates Replace
+        # Patch messages "starting from 0 and counting up to 63"). Hardware
+        # Patch View shows patches 1-32 on page 1, 33-64 on page 2 (Shift+Synth1/2,
+        # then the non-lit Oct button flips page) - both numbered from this slot.
+        # The 32-pad grid is 4 rows x 8 columns, filled row-major from the top-left
+        # (slot 0 = row 1/col 1; verified against hardware: patch 1 = top-left of
+        # page 1, patch 64 = row 4/col 8 of page 2).
+        m = re.search(r"patch_(\d+)\.syx$", p["url"])
+        slot = int(m.group(1)) if m else None
+        decoded["slot"] = slot
+        if slot is not None:
+            decoded["slotDisplay"] = slot + 1
+            decoded["patchViewPage"] = 1 if slot < 32 else 2
+            pos = slot % 32
+            decoded["patchViewPosition"] = pos + 1
+            decoded["patchViewRow"] = (pos // 8) + 1
+            decoded["patchViewCol"] = (pos % 8) + 1
+
         patches.append(decoded)
 
     out = {

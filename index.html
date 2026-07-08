@@ -28,6 +28,8 @@ header.top {
 }
 header.top .title { font-size:1.05em; font-weight:800; padding-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
 header.top .title small { color:var(--dim); font-weight:400; font-size:0.7em; }
+nav.tabs, .chips { scrollbar-width:none; -ms-overflow-style:none; }
+nav.tabs::-webkit-scrollbar, .chips::-webkit-scrollbar { display:none; height:0; }
 nav.tabs { display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; }
 nav.tabs label {
   flex:0 0 auto; background:var(--panel2); color:var(--dim); border:1px solid var(--line);
@@ -66,6 +68,7 @@ kbd {
   flex:1; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px;
   color:var(--text); font-size:0.95em;
 }
+.filter-label { font-size:0.72em; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em; margin:10px 0 4px; }
 .chips { display:flex; gap:6px; overflow-x:auto; padding:4px 0 10px; }
 .chip {
   flex:0 0 auto; background:var(--panel); border:1px solid var(--line); color:var(--dim);
@@ -78,6 +81,10 @@ kbd {
   display:flex; align-items:center; gap:8px; text-align:left; font-size:0.95em;
 }
 .card-head::-webkit-details-marker { display:none; }
+.p-num {
+  flex:0 0 auto; font-family:ui-monospace,Menlo,monospace; font-size:0.78em; font-weight:700;
+  color:var(--bg); background:var(--accent2); border-radius:6px; padding:2px 6px; letter-spacing:0.02em;
+}
 .card .p-name { font-weight:700; flex:1; }
 .p-tags { display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end; }
 .tag { font-size:0.68em; padding:2px 7px; border-radius:999px; background:var(--panel2); color:var(--dim); white-space:nowrap; }
@@ -86,6 +93,8 @@ kbd {
 .chev { color:var(--dim); transition:transform 0.15s; }
 .card[open] .chev { transform:rotate(180deg); }
 .card-body { padding:0 14px 14px; border-top:1px solid var(--line); }
+.location-line { font-size:0.8em; color:var(--dim); margin:10px 0 0; }
+.location-line kbd { font-size:0.95em; }
 .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
 .blk p { font-size:0.83em; color:var(--dim); }
 .blk h4 { margin-bottom:2px; }
@@ -143,7 +152,7 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </table>
     <h3>Patch &amp; sound</h3>
     <table>
-      <tr><td><kbd>Shift</kbd>+<kbd>Synth 1</kbd> / <kbd>Synth 2</kbd></td><td>Open Patch View to change that synth's patch</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Synth 1</kbd> / <kbd>Synth 2</kbd></td><td>Open Patch View to change that synth's patch. Each pad = one of 64 patches: page 1 = patches 1&ndash;32, page 2 = patches 33&ndash;64. Press the non-lit Oct button to flip page. The Patches tab shows each patch's number for exactly this.</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Drum 1&ndash;4</kbd></td><td>Change patch for that drum track</td></tr>
       <tr><td><kbd>Shift</kbd>+ pad (in Patch View)</td><td>Disable audition/preview when browsing patches</td></tr>
     </table>
@@ -290,21 +299,33 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
 
 <section class="tab" id="tab-patches">
   <h2>Team Novation Ci &mdash; 64 synth patches</h2>
-  <p class="dim">Tap a patch to expand its full parameter set. This pack also ships 64 one-shot samples and 32 demo sessions (not covered here &mdash; just audio/session data, nothing to decode).</p>
   <div class="search-row"><input id="search" type="search" placeholder="Search patch name&hellip;" autocomplete="off"></div>
+  <div class="filter-label">Category</div>
   <div class="chips" id="catChips">
     <button class="chip active" data-cat="all">All</button>
     <button class="chip" data-cat="arp">Arp</button><button class="chip" data-cat="bass">Bass</button><button class="chip" data-cat="bell">Bell</button><button class="chip" data-cat="drum">Drum</button><button class="chip" data-cat="keyboard">Keyboard</button><button class="chip" data-cat="lead">Lead</button><button class="chip" data-cat="movement">Movement</button><button class="chip" data-cat="pad">Pad</button><button class="chip" data-cat="poly">Poly</button><button class="chip" data-cat="sfx">SFX</button><button class="chip" data-cat="string">String</button><button class="chip" data-cat="voc/tune">Voc/Tune</button>
   </div>
+  <div class="filter-label">Genre</div>
+  <div class="chips" id="genreChips">
+    <button class="chip active" data-genre="all">All</button>
+    <button class="chip" data-genre="classic">Classic</button><button class="chip" data-genre="d&b/breaks">D&B/Breaks</button><button class="chip" data-genre="dubstep">Dubstep</button><button class="chip" data-genre="house">House</button><button class="chip" data-genre="industrial">Industrial</button><button class="chip" data-genre="jazz">Jazz</button><button class="chip" data-genre="r&b/hhop">R&B/HHop</button><button class="chip" data-genre="rock/pop">Rock/Pop</button><button class="chip" data-genre="techno">Techno</button>
+  </div>
+  <div class="filter-label">Voice</div>
+  <div class="chips" id="voiceChips">
+    <button class="chip active" data-voice="all">All</button>
+    <button class="chip" data-voice="mono">Mono</button><button class="chip" data-voice="mono ag">Mono AG</button><button class="chip" data-voice="poly">Poly</button>
+  </div>
   <div id="patchList">
   
-  <details class="card" data-name="aciiid" data-cat="bass" data-genre="house">
+  <details class="card" data-name="aciiid" data-cat="bass" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">01</span>
       <span class="p-name">Aciiid</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.1</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [7:3] PW, interp 19, idx -64</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [5:5] PW, interp 127</p></div>
@@ -327,13 +348,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="happy hard" data-cat="bass" data-genre="d&b/breaks">
+  <details class="card" data-name="happy hard" data-cat="bass" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">02</span>
       <span class="p-name">Happy Hard</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.2</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [2:8] PW, interp 127, tune -13st +0c</p></div>
@@ -356,13 +379,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="lfo disko" data-cat="bass" data-genre="house">
+  <details class="card" data-name="lfo disko" data-cat="bass" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">03</span>
       <span class="p-name">LFO disko</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.3</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127, tune -24st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Digital Vocal 2, interp 127, vsync 127, tune -24st +0c</p></div>
@@ -385,13 +410,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="meeelow" data-cat="poly" data-genre="classic">
+  <details class="card" data-name="meeelow" data-cat="poly" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">04</span>
       <span class="p-name">Meeelow</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.4</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Analogue Sync, interp 127, idx -64</p></div>
@@ -414,13 +441,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="not fm" data-cat="bass" data-genre="d&b/breaks">
+  <details class="card" data-name="not fm" data-cat="bass" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">05</span>
       <span class="p-name">Not FM</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.5</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [2:8] PW, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [9:1] PW, interp 127</p></div>
@@ -443,13 +472,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="filth sense" data-cat="bass" data-genre="classic">
+  <details class="card" data-name="filth sense" data-cat="bass" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">06</span>
       <span class="p-name">Filth Sense</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.6</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, tune -12st +0c</p></div>
@@ -472,13 +503,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="filthres" data-cat="bass" data-genre="d&b/breaks">
+  <details class="card" data-name="filthres" data-cat="bass" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">07</span>
       <span class="p-name">Filthres</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.7</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Pulse Width, interp 127, idx -1, tune -12st +0c</p></div>
@@ -501,13 +534,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="flamed" data-cat="poly" data-genre="industrial">
+  <details class="card" data-name="flamed" data-cat="poly" data-genre="industrial" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">08</span>
       <span class="p-name">Flamed</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Industrial</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>1.8</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine Table, interp 127, idx -35</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Square, interp 127, idx -21, tune -24st +0c</p></div>
@@ -530,13 +565,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="good lead" data-cat="lead" data-genre="rock/pop">
+  <details class="card" data-name="good lead" data-cat="lead" data-genre="rock/pop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">09</span>
       <span class="p-name">Good Lead</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Rock/Pop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.1</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Nasty 1, interp 127, idx +23, density 65</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Analogue Sync, interp 127, idx +37, density 31, tune +12st +0c</p></div>
@@ -559,13 +596,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="filtered lead" data-cat="bell" data-genre="house">
+  <details class="card" data-name="filtered lead" data-cat="bell" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">10</span>
       <span class="p-name">Filtered Lead</span>
       <span class="p-tags"><span class="tag cat-Bell">Bell</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.2</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine Table, interp 127, tune +12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [2:8] PW, idx -19, tune +12st +0c</p></div>
@@ -588,13 +627,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="saw striker" data-cat="lead" data-genre="techno">
+  <details class="card" data-name="saw striker" data-cat="lead" data-genre="techno" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">11</span>
       <span class="p-name">Saw Striker</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Techno</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.3</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [8:2] PW, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -617,13 +658,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="alive" data-cat="poly" data-genre="rock/pop">
+  <details class="card" data-name="alive" data-cat="poly" data-genre="rock/pop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">12</span>
       <span class="p-name">Alive</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Rock/Pop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.4</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [8:2] PW, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [2:8] PW, interp 127, idx -1</p></div>
@@ -646,13 +689,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="aggie" data-cat="lead" data-genre="classic">
+  <details class="card" data-name="aggie" data-cat="lead" data-genre="classic" data-voice="mono ag">
     <summary class="card-head">
+      <span class="p-num">13</span>
       <span class="p-name">Aggie</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Classic</span><span class="tag voice">Mono AG</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.5</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Collection 3, interp 127, idx +14, density 45, tune +12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [6:4] PW, interp 97, idx +23, tune -12st +12c</p></div>
@@ -675,13 +720,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="frosted glass" data-cat="pad" data-genre="industrial">
+  <details class="card" data-name="frosted glass" data-cat="pad" data-genre="industrial" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">14</span>
       <span class="p-name">Frosted Glass</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Industrial</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.6</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Nasty 1, interp 127, idx -47</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Pulse Width, interp 127, idx -21, tune +12st +0c</p></div>
@@ -704,13 +751,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="gaston" data-cat="keyboard" data-genre="rock/pop">
+  <details class="card" data-name="gaston" data-cat="keyboard" data-genre="rock/pop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">15</span>
       <span class="p-name">Gaston</span>
       <span class="p-tags"><span class="tag cat-Keyboard">Keyboard</span><span class="tag genre">Rock/Pop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.7</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune -12st +0c</p></div>
@@ -733,13 +782,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="k-plunk" data-cat="bell" data-genre="techno">
+  <details class="card" data-name="k-plunk" data-cat="bell" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">16</span>
       <span class="p-name">K-plunk</span>
       <span class="p-tags"><span class="tag cat-Bell">Bell</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>2.8</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Tri-Saw Blend, interp 127, idx -31</p></div>
@@ -762,13 +813,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="smooth pad" data-cat="pad" data-genre="classic">
+  <details class="card" data-name="smooth pad" data-cat="pad" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">17</span>
       <span class="p-name">Smooth Pad</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.1</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Sync, interp 127, tune +0st +63c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Digital Vocal 6, interp 127, tune +0st +63c</p></div>
@@ -791,13 +844,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="twins" data-cat="movement" data-genre="techno">
+  <details class="card" data-name="twins" data-cat="movement" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">18</span>
       <span class="p-name">Twins</span>
       <span class="p-tags"><span class="tag cat-Movement">Movement</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.2</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [5:5] PW, interp 127, idx +5</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -820,13 +875,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="weird pad" data-cat="poly" data-genre="classic">
+  <details class="card" data-name="weird pad" data-cat="poly" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">19</span>
       <span class="p-name">Weird Pad</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.3</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine Table</p></div>
@@ -849,13 +906,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="vel filterfun" data-cat="lead" data-genre="techno">
+  <details class="card" data-name="vel filterfun" data-cat="lead" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">20</span>
       <span class="p-name">Vel FilterFun</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.4</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [6:4] PW, idx -1, density 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine Table, interp 127</p></div>
@@ -878,13 +937,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="movt4" data-cat="pad" data-genre="classic">
+  <details class="card" data-name="movt4" data-cat="pad" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">21</span>
       <span class="p-name">Movt4</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.5</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127, idx +31</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Collection 2, interp 127, idx +38, tune -12st +0c</p></div>
@@ -907,13 +968,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="frog steps" data-cat="lead" data-genre="r&b/hhop">
+  <details class="card" data-name="frog steps" data-cat="lead" data-genre="r&b/hhop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">22</span>
       <span class="p-name">Frog Steps</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.6</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Square, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Analogue Pulse, interp 39, idx +22, tune -12st -2c</p></div>
@@ -936,13 +999,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="organ-to-ring" data-cat="keyboard" data-genre="techno">
+  <details class="card" data-name="organ-to-ring" data-cat="keyboard" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">23</span>
       <span class="p-name">Organ-to-ring</span>
       <span class="p-tags"><span class="tag cat-Keyboard">Keyboard</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.7</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Pulse, interp 127, idx +36</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [3:7] PW, interp 127, idx +36, tune -12st +4c</p></div>
@@ -965,13 +1030,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="ringy patch" data-cat="keyboard" data-genre="jazz">
+  <details class="card" data-name="ringy patch" data-cat="keyboard" data-genre="jazz" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">24</span>
       <span class="p-name">Ringy Patch</span>
       <span class="p-tags"><span class="tag cat-Keyboard">Keyboard</span><span class="tag genre">Jazz</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>3.8</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Square, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Analogue Pulse, interp 39, idx +22, tune -12st -2c</p></div>
@@ -994,13 +1061,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="wobber blobber" data-cat="poly" data-genre="industrial">
+  <details class="card" data-name="wobber blobber" data-cat="poly" data-genre="industrial" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">25</span>
       <span class="p-name">Wobber Blobber</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Industrial</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.1</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [2:8] PW, interp 127</p></div>
@@ -1023,13 +1092,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="sick lead" data-cat="lead" data-genre="techno">
+  <details class="card" data-name="sick lead" data-cat="lead" data-genre="techno" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">26</span>
       <span class="p-name">Sick Lead</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Techno</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.2</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Square, vsync 127, tune -56st +0c</p></div>
@@ -1052,13 +1123,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="shimmer atmo" data-cat="pad" data-genre="industrial">
+  <details class="card" data-name="shimmer atmo" data-cat="pad" data-genre="industrial" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">27</span>
       <span class="p-name">Shimmer Atmo</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Industrial</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.3</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Vocal 2, interp 127, density 3</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Analogue Pulse, interp 127</p></div>
@@ -1081,13 +1154,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="noisefx" data-cat="sfx" data-genre="house">
+  <details class="card" data-name="noisefx" data-cat="sfx" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">28</span>
       <span class="p-name">noiseFX</span>
       <span class="p-tags"><span class="tag cat-SFX">SFX</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.4</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Tri-Saw Blend, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, idx +1, tune -36st +0c</p></div>
@@ -1110,13 +1185,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="sine pop" data-cat="bass" data-genre="techno">
+  <details class="card" data-name="sine pop" data-cat="bass" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">29</span>
       <span class="p-name">Sine Pop</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.5</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine, interp 127</p></div>
@@ -1139,13 +1216,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="starscreamer" data-cat="movement" data-genre="house">
+  <details class="card" data-name="starscreamer" data-cat="movement" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">30</span>
       <span class="p-name">StarScreamer</span>
       <span class="p-tags"><span class="tag cat-Movement">Movement</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.6</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Pulse, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, tune +0st +12c</p></div>
@@ -1168,13 +1247,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="wobble chord" data-cat="movement" data-genre="r&b/hhop">
+  <details class="card" data-name="wobble chord" data-cat="movement" data-genre="r&b/hhop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">31</span>
       <span class="p-name">Wobble Chord</span>
       <span class="p-tags"><span class="tag cat-Movement">Movement</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.7</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127</p></div>
@@ -1197,13 +1278,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="yaw" data-cat="bass" data-genre="house">
+  <details class="card" data-name="yaw" data-cat="bass" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">32</span>
       <span class="p-name">Yaw</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 1, pad <b>4.8</b></p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -1226,13 +1309,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="grime square" data-cat="bass" data-genre="dubstep">
+  <details class="card" data-name="grime square" data-cat="bass" data-genre="dubstep" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">33</span>
       <span class="p-name">Grime Square</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Dubstep</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.1</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Digital Nasty 2, interp 127, idx -64, density 39</p></div>
@@ -1255,13 +1340,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="syncbass" data-cat="bass" data-genre="techno">
+  <details class="card" data-name="syncbass" data-cat="bass" data-genre="techno" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">34</span>
       <span class="p-name">SyncBass</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Techno</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.2</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Sync, interp 127, idx -64</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Pulse Width, interp 127, tune -12st +0c</p></div>
@@ -1284,13 +1371,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="bloghouse bass" data-cat="bass" data-genre="house">
+  <details class="card" data-name="bloghouse bass" data-cat="bass" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">35</span>
       <span class="p-name">BlogHouse Bass</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.3</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Collection 1, idx -44</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [5:5] PW, interp 121, tune -12st +0c</p></div>
@@ -1313,13 +1402,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="bubble bass" data-cat="bass" data-genre="house">
+  <details class="card" data-name="bubble bass" data-cat="bass" data-genre="house" data-voice="mono ag">
     <summary class="card-head">
+      <span class="p-num">36</span>
       <span class="p-name">Bubble Bass</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono AG</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.4</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune -24st +0c</p></div>
@@ -1342,13 +1433,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="smoov bass" data-cat="bass" data-genre="house">
+  <details class="card" data-name="smoov bass" data-cat="bass" data-genre="house" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">37</span>
       <span class="p-name">Smoov Bass</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">House</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.5</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Tri-Saw Blend, idx -64, density 127, tune +36st +0c</p></div>
@@ -1371,13 +1464,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="wigbaz" data-cat="bass" data-genre="d&b/breaks">
+  <details class="card" data-name="wigbaz" data-cat="bass" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">38</span>
       <span class="p-name">WigBaz</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.6</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Vocal 2, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Pulse Width, interp 127, idx -7</p></div>
@@ -1400,13 +1495,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="yo!" data-cat="bass" data-genre="r&b/hhop">
+  <details class="card" data-name="yo!" data-cat="bass" data-genre="r&b/hhop" data-voice="mono ag">
     <summary class="card-head">
+      <span class="p-num">39</span>
       <span class="p-name">Yo!</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Mono AG</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.7</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Vocal 5, interp 127, idx -40, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune -24st +0c</p></div>
@@ -1429,13 +1526,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="bass grease" data-cat="bass" data-genre="techno">
+  <details class="card" data-name="bass grease" data-cat="bass" data-genre="techno" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">40</span>
       <span class="p-name">Bass Grease</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Techno</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>1.8</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Collection 1, interp 127, idx -64, density 36</p></div>
@@ -1458,13 +1557,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="sub dub" data-cat="bass" data-genre="dubstep">
+  <details class="card" data-name="sub dub" data-cat="bass" data-genre="dubstep" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">41</span>
       <span class="p-name">Sub Dub</span>
       <span class="p-tags"><span class="tag cat-Bass">Bass</span><span class="tag genre">Dubstep</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.1</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [1:9] PW, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune -12st +0c</p></div>
@@ -1487,13 +1588,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="phone lead" data-cat="lead" data-genre="r&b/hhop">
+  <details class="card" data-name="phone lead" data-cat="lead" data-genre="r&b/hhop" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">42</span>
       <span class="p-name">Phone Lead</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.2</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune +3st +0c</p></div>
@@ -1516,13 +1619,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="funkth lead" data-cat="lead" data-genre="jazz">
+  <details class="card" data-name="funkth lead" data-cat="lead" data-genre="jazz" data-voice="mono ag">
     <summary class="card-head">
+      <span class="p-num">43</span>
       <span class="p-name">Funkth Lead</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">Jazz</span><span class="tag voice">Mono AG</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.3</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, tune +7st +0c</p></div>
@@ -1545,13 +1650,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="game over arp" data-cat="arp" data-genre="classic">
+  <details class="card" data-name="game over arp" data-cat="arp" data-genre="classic" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">44</span>
       <span class="p-name">Game Over Arp</span>
       <span class="p-tags"><span class="tag cat-Arp">Arp</span><span class="tag genre">Classic</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.4</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Square, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine Table, interp 127, idx -64</p></div>
@@ -1574,13 +1681,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="dev's pad" data-cat="poly" data-genre="classic">
+  <details class="card" data-name="dev's pad" data-cat="poly" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">45</span>
       <span class="p-name">Dev's Pad</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.5</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Square, interp 127, idx -14, density 65</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Pulse Width, interp 69, idx -64, density 67, tune +0st +4c</p></div>
@@ -1603,13 +1712,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="noisey lead" data-cat="lead" data-genre="d&b/breaks">
+  <details class="card" data-name="noisey lead" data-cat="lead" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">46</span>
       <span class="p-name">Noisey Lead</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.6</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [4:6] PW, interp 127, idx -2, vsync 1</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -1632,13 +1743,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="harsh wiggle" data-cat="lead" data-genre="d&b/breaks">
+  <details class="card" data-name="harsh wiggle" data-cat="lead" data-genre="d&b/breaks" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">47</span>
       <span class="p-name">Harsh Wiggle</span>
       <span class="p-tags"><span class="tag cat-Lead">Lead</span><span class="tag genre">D&B/Breaks</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.7</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [4:6] PW, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Square, interp 127, tune -36st +0c</p></div>
@@ -1661,13 +1774,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="stb dance" data-cat="keyboard" data-genre="house">
+  <details class="card" data-name="stb dance" data-cat="keyboard" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">48</span>
       <span class="p-name">STB Dance</span>
       <span class="p-tags"><span class="tag cat-Keyboard">Keyboard</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>2.8</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine Table, idx -64</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Digital Nasty 2, interp 127, idx -58, density 108</p></div>
@@ -1690,13 +1805,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="pwr pad" data-cat="poly" data-genre="techno">
+  <details class="card" data-name="pwr pad" data-cat="poly" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">49</span>
       <span class="p-name">PWR Pad</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.1</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Sync, interp 127, idx -63, density 29, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, density 98, tune -24st +0c</p></div>
@@ -1719,13 +1836,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="reskey" data-cat="keyboard" data-genre="jazz">
+  <details class="card" data-name="reskey" data-cat="keyboard" data-genre="jazz" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">50</span>
       <span class="p-name">ResKey</span>
       <span class="p-tags"><span class="tag cat-Keyboard">Keyboard</span><span class="tag genre">Jazz</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.2</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Tri-Saw Blend, interp 127, idx -64, density 1</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [2:8] PW, interp 127</p></div>
@@ -1748,13 +1867,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="spookey" data-cat="poly" data-genre="r&b/hhop">
+  <details class="card" data-name="spookey" data-cat="poly" data-genre="r&b/hhop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">51</span>
       <span class="p-name">SpooKey</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.3</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [8:2] PW, interp 127, idx +4</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Square, interp 127, idx +38, vsync 26, tune +12st +0c</p></div>
@@ -1777,13 +1898,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="unstable pad" data-cat="pad" data-genre="classic">
+  <details class="card" data-name="unstable pad" data-cat="pad" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">52</span>
       <span class="p-name">Unstable Pad</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.4</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sawtooth, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -1806,13 +1929,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="talk to me" data-cat="voc/tune" data-genre="jazz">
+  <details class="card" data-name="talk to me" data-cat="voc/tune" data-genre="jazz" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">53</span>
       <span class="p-name">Talk to Me</span>
       <span class="p-tags"><span class="tag cat-VocTune">Voc/Tune</span><span class="tag genre">Jazz</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.5</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Digital Vocal 3, interp 3</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine Table, interp 127, idx -64, tune -12st +0c</p></div>
@@ -1835,13 +1960,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="eskimo" data-cat="string" data-genre="r&b/hhop">
+  <details class="card" data-name="eskimo" data-cat="string" data-genre="r&b/hhop" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">54</span>
       <span class="p-name">Eskimo</span>
       <span class="p-tags"><span class="tag cat-String">String</span><span class="tag genre">R&B/HHop</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.6</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Collection 2, interp 60, idx -43, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Saw [6:4] PW, interp 127, idx +2, tune -12st +0c</p></div>
@@ -1864,13 +1991,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="betanmoan" data-cat="pad" data-genre="house">
+  <details class="card" data-name="betanmoan" data-cat="pad" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">55</span>
       <span class="p-name">Betanmoan</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.7</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Analogue Sync, interp 127, idx -64</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Collection 1, interp 46, idx +63, vsync 63</p></div>
@@ -1893,13 +2022,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="siney tinez" data-cat="pad" data-genre="classic">
+  <details class="card" data-name="siney tinez" data-cat="pad" data-genre="classic" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">56</span>
       <span class="p-name">Siney Tinez</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">Classic</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>3.8</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune +0st -2c</p></div>
@@ -1922,13 +2053,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="woo-z" data-cat="movement" data-genre="house">
+  <details class="card" data-name="woo-z" data-cat="movement" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">57</span>
       <span class="p-name">Woo-z</span>
       <span class="p-tags"><span class="tag cat-Movement">Movement</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.1</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine Table, interp 127, idx -64</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, density 42, tune -12st +0c</p></div>
@@ -1951,13 +2084,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="spaceradio" data-cat="sfx" data-genre="techno">
+  <details class="card" data-name="spaceradio" data-cat="sfx" data-genre="techno" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">58</span>
       <span class="p-name">SpaceRadio</span>
       <span class="p-tags"><span class="tag cat-SFX">SFX</span><span class="tag genre">Techno</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.2</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Square, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -1980,13 +2115,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="kick!" data-cat="drum" data-genre="techno">
+  <details class="card" data-name="kick!" data-cat="drum" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">59</span>
       <span class="p-name">Kick!</span>
       <span class="p-tags"><span class="tag cat-Drum">Drum</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.3</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine, interp 127, tune -24st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sine Table, interp 127, idx -64, tune -36st +0c</p></div>
@@ -2009,13 +2146,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="space perc" data-cat="drum" data-genre="classic">
+  <details class="card" data-name="space perc" data-cat="drum" data-genre="classic" data-voice="mono">
     <summary class="card-head">
+      <span class="p-num">60</span>
       <span class="p-name">Space Perc</span>
       <span class="p-tags"><span class="tag cat-Drum">Drum</span><span class="tag genre">Classic</span><span class="tag voice">Mono</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.4</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 12, idx -58, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Triangle, interp 127, tune -36st +0c</p></div>
@@ -2038,13 +2177,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="sawdet" data-cat="pad" data-genre="house">
+  <details class="card" data-name="sawdet" data-cat="pad" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">61</span>
       <span class="p-name">Sawdet</span>
       <span class="p-tags"><span class="tag cat-Pad">Pad</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.5</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Saw [3:7] PW, interp 92, idx -62, density 31</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Collection 3, interp 127, tune +12st +0c</p></div>
@@ -2067,13 +2208,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="breathe" data-cat="poly" data-genre="techno">
+  <details class="card" data-name="breathe" data-cat="poly" data-genre="techno" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">62</span>
       <span class="p-name">Breathe</span>
       <span class="p-tags"><span class="tag cat-Poly">Poly</span><span class="tag genre">Techno</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.6</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Triangle, interp 127, tune -12st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127</p></div>
@@ -2096,13 +2239,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="fading pulse" data-cat="movement" data-genre="house">
+  <details class="card" data-name="fading pulse" data-cat="movement" data-genre="house" data-voice="poly">
     <summary class="card-head">
+      <span class="p-num">63</span>
       <span class="p-name">Fading Pulse</span>
       <span class="p-tags"><span class="tag cat-Movement">Movement</span><span class="tag genre">House</span><span class="tag voice">Poly</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.7</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Pulse Width, interp 127</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, density 60, tune -12st +0c</p></div>
@@ -2125,13 +2270,15 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     </div>
   </details>
 
-  <details class="card" data-name="alien x talk" data-cat="sfx" data-genre="industrial">
+  <details class="card" data-name="alien x talk" data-cat="sfx" data-genre="industrial" data-voice="mono ag">
     <summary class="card-head">
+      <span class="p-num">64</span>
       <span class="p-name">Alien X Talk</span>
       <span class="p-tags"><span class="tag cat-SFX">SFX</span><span class="tag genre">Industrial</span><span class="tag voice">Mono AG</span></span>
       <span class="chev">&#9662;</span>
     </summary>
     <div class="card-body">
+      <p class="location-line">Hold <kbd>Shift</kbd>+<kbd>Synth&nbsp;1</kbd> or <kbd>Synth&nbsp;2</kbd> to open Patch View &middot; Page 2, pad <b>4.8</b> &mdash; press the non-lit Oct button to reach page 2 if needed</p>
       <div class="grid2">
         <div class="blk"><h4>Osc 1</h4><p>Sine Table, interp 127, tune -48st +0c</p></div>
         <div class="blk"><h4>Osc 2</h4><p>Sawtooth, interp 127, tune -64st +0c</p></div>
@@ -2164,6 +2311,11 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
     <p><b>Getting it into Safari on iPhone</b> (needed for Add to Home Screen): tapping an <code>.html</code> file in Files/Mail/AirDrop usually opens Apple's <b>Quick Look</b> preview, not Safari. From Quick Look, tap the <b>Share</b> icon (square with an arrow) and look for a <b>Safari</b> icon in the row of apps &mdash; tapping it opens the page properly in Safari. From there, tap <b>Share</b> &rarr; <b>Add to Home Screen</b> to launch it full-screen and fully offline afterwards.</p>
     <p>Patch data was reverse-engineered from the Novation Components web editor's client-side code and cross-validated byte-for-byte against Novation's official <i>Circuit Programmer's Reference Guide 1.3</i> (Synth Patch Format table, page 14&ndash;18).</p>
   </div>
+  <h3>Patches</h3>
+  <div class="box">
+    <p>Tap a patch to expand its full parameter set. This pack also ships 64 one-shot samples and 32 demo sessions (not covered here &mdash; just audio/session data, nothing to decode).</p>
+    <p>The numbered badge on each patch (e.g. <span class="p-num" style="display:inline">01</span>) is its slot 1&ndash;64 in Patch View on the hardware &mdash; stays visible even when filtered, so you always know where to find it. See Workflow &rarr; Shift shortcuts &rarr; Patch &amp; sound for how Patch View is laid out.</p>
+  </div>
   <h3>Regenerating for another pack</h3>
   <div class="box"><p>This page is generated from a <code>.circuitpack</code> export (rename to <code>.zip</code> and unzip: <code>index.json</code> + <code>patches/*.syx</code>). The same decoder works for any Circuit (product 0x60) factory or user pack &mdash; only the embedded patch JSON below needs regenerating.</p></div>
 </section>
@@ -2174,16 +2326,21 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
 
 <script>
 const search = document.getElementById('search');
-const chips = document.querySelectorAll('#catChips .chip');
-let activeCat = 'all';
+
+// Each filter group: chip container id -> { dataKey: card.dataset key, active: current value }
+const filterGroups = [
+  { id: 'catChips', key: 'cat' },
+  { id: 'genreChips', key: 'genre' },
+  { id: 'voiceChips', key: 'voice' },
+].map(g => ({ ...g, active: 'all', chips: document.querySelectorAll('#' + g.id + ' .chip') }));
 
 function applyFilter() {
   const q = search.value.trim().toLowerCase();
   let visible = 0;
   document.querySelectorAll('#patchList .card').forEach(card => {
     const matchesText = card.dataset.name.includes(q);
-    const matchesCat = activeCat === 'all' || card.dataset.cat === activeCat;
-    const show = matchesText && matchesCat;
+    const matchesGroups = filterGroups.every(g => g.active === 'all' || card.dataset[g.key] === g.active);
+    const show = matchesText && matchesGroups;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -2191,12 +2348,14 @@ function applyFilter() {
 }
 
 search.addEventListener('input', applyFilter);
-chips.forEach(chip => {
-  chip.addEventListener('click', () => {
-    chips.forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeCat = chip.dataset.cat;
-    applyFilter();
+filterGroups.forEach(group => {
+  group.chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      group.chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      group.active = chip.dataset[group.key];
+      applyFilter();
+    });
   });
 });
 </script>
