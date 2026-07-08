@@ -1,0 +1,12 @@
+# Novation's copyrighted pack content — not redistributed, see README
+*.circuitpack
+*.zip
+*.syx
+extracted/
+
+# Build artifact, regenerate via tools/parse_patches.py
+tools/patches_decoded.json
+tools/__pycache__/
+
+# Local scratch
+.claude/settings.local.json
