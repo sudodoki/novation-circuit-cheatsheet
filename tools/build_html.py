@@ -270,12 +270,16 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
       <tr><td><kbd>Shift</kbd>+<kbd>Play</kbd></td><td>Continue pattern from where sequencer last stopped</td></tr>
       <tr><td><kbd>Shift</kbd>+ pattern pad</td><td>Jump to / start playing that pattern immediately from the cursor's step</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Patterns</kbd></td><td>Toggle "Append to Sequence" for pattern-chain building</td></tr>
-      <tr><td><kbd>Shift</kbd>+<kbd>Oct&#9650;/Oct&#9660;</kbd></td><td>Transpose the whole pattern up/down an octave</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Oct&#9650;/Oct&#9660;</kbd> (in a Synth View)</td><td>"Pattern Octave" &mdash; transpose the whole synth pattern up/down an octave (works playing or stopped). In <i>Patterns</i> View the Oct buttons do something different &mdash; see Pattern Chaining below.</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Note</kbd></td><td>Expanded Note View (2 extra octaves of pads)</td></tr>
       <tr><td><kbd>Shift</kbd>+<kbd>Velocity</kbd></td><td>Toggle Fixed Velocity (locks velocity to 96)</td></tr>
-      <tr><td><kbd>Shift</kbd>+<kbd>Gate</kbd> (on a pressed step)</td><td>Microstep menu &mdash; retime individual notes on that step</td></tr>
-      <tr><td><kbd>Shift</kbd>+<kbd>Record</kbd></td><td>Toggle quantised vs. non-quantised (microstep) live recording (v1.8+)</td></tr>
     </table>
+    <h3>Microsteps &amp; non-quantised record <span class="dim">(v1.8+)</span></h3>
+    <table>
+      <tr><td><kbd>Shift</kbd>+<kbd>Record</kbd> (any view)</td><td>Toggle quantised (default) vs. non-quantised recording. Record button bright = quantised (snaps hits to the 16 steps); dim = non-quantised (records your exact sub-step timing). Persists across session change / power cycle; applies to synth and drum tracks.</td></tr>
+      <tr><td>In <kbd>Gate</kbd> view, hold <kbd>Shift</kbd> (on a step that has notes)</td><td>Opens the microstep menu to retime individual notes. Row 2 (purple/green) lists that step's notes left-to-right by assignment order, all selected by default &mdash; tap one to select just it (also previews it), or hold one and tap others to multi-select. Then row 1 (yellow, 6 positions) sets which microstep the selected note(s) trigger on.</td></tr>
+    </table>
+    <p class="dim"><b>Per-note velocity (v1.8+):</b> with Fixed Velocity <b>off</b>, notes stacked on the same step keep independent velocities &mdash; hit the step at one velocity, then hit it again at another. To change one, unassign it and re-hit the pad at the new velocity. Velocity view shows the step's spread: brightest pad = lowest velocity present, dimmest = highest.</p>
     <h3>Patch &amp; sound</h3>
     <table>
       <tr><td><kbd>Shift</kbd>+<kbd>Synth 1</kbd> / <kbd>Synth 2</kbd></td><td>Open Patch View to change that synth's patch. Each pad = one of 64 patches: page 1 = patches 1&ndash;32, page 2 = patches 33&ndash;64. Press the non-lit Oct button to flip page. The Patches tab shows each patch's number for exactly this.</td></tr>
@@ -324,7 +328,7 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
       <tr><th>Button</th><th>View shows</th></tr>
       <tr><td>Note</td><td>Enter synth notes / drum hits per step</td></tr>
       <tr><td>Velocity</td><td>Edit per-step (or per-note) velocity</td></tr>
-      <tr><td>Gate</td><td>Edit step length in microsteps; Shift+Gate = microstep note editor</td></tr>
+      <tr><td>Gate</td><td>Edit step length; hold Shift in Gate view = microstep note editor (v1.8+)</td></tr>
       <tr><td>Nudge</td><td>Shift active steps forward/back in time</td></tr>
       <tr><td>Length</td><td>Set pattern length, 1&ndash;16 steps</td></tr>
       <tr><td>Scales</td><td>Choose 1 of 16 scales; transpose keyboard</td></tr>
@@ -333,6 +337,24 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
       <tr><td>FX</td><td>Per-track reverb/delay send</td></tr>
       <tr><td>Sessions</td><td>Save/load full sessions (32 slots)</td></tr>
     </table>
+  </div>
+
+  <h2>Pattern Chaining &amp; Sequences</h2>
+  <div class="box">
+    <p>Each track has 8 pattern memories. Play them back-to-back for a longer arrangement &mdash; up to <b>128 steps</b> (8 &times; 16), each track switching pattern every 16 steps. Chaining is <b>per-track</b>.</p>
+    <h3>Basic chain (contiguous patterns)</h3>
+    <table>
+      <tr><td>In Patterns View: hold the <b>lowest</b> pattern pad, then press the <b>highest</b></td><td>Chains every pattern in between (all light up in the track colour). Patterns must be <b>contiguous</b> &mdash; 1-2-3-4 or 4-5 works, 1-2-6 does not.</td></tr>
+    </table>
+    <p class="dim">The longest chain across tracks sets the overall sequence length; shorter chains just loop to fill it (a 1-pattern track repeats 4&times; against a 4-pattern track). <kbd>Shift</kbd>+<kbd>Play</kbd> restarts from where the sequencer stopped rather than the very start.</p>
+    <h3>Pattern Chain Sequences <span class="dim">(v1.7+)</span></h3>
+    <p>For repeated, reordered or non-contiguous playback, build an explicit sequence: with the transport <b>stopped</b>, hold <kbd>Shift</kbd> in Patterns View and tap patterns/chains in any order &mdash; up to <b>32 patterns or 16 chains</b> per track (defined independently per track). Release <kbd>Shift</kbd> to finish.</p>
+    <table>
+      <tr><td>Hold <kbd>Shift</kbd> in Patterns View, tap pads</td><td>Add patterns (and whole chains) to the track's sequence in any order; repeats allowed. Only the last-entered one stays lit while building. A chain counts as two entries.</td></tr>
+      <tr><td><kbd>Oct&#8722;</kbd> / <kbd>Oct+</kbd> (in this mode)</td><td>Navigate the four <b>Sequence Banks</b> (4 &times; 8 = 32 patterns) shown on the macro-knob LEDs, and pick which track's sequence those LEDs display.</td></tr>
+      <tr><td><kbd>Shift</kbd>+<kbd>Patterns</kbd></td><td>Toggle <b>Append</b>: on = new taps add to the existing sequence (even while playing) instead of replacing it. Off = a new sequence <b>replaces</b> the track's old one.</td></tr>
+    </table>
+    <p class="dim">Tip: leave one pattern memory empty and drop it into the sequence wherever you want that track to fall silent for 16 steps.</p>
   </div>
 
   <h2>Scales View</h2>
@@ -345,6 +367,7 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
     </table>
     <p class="dim">Notes outside the current scale are 'snapped' to the nearest in-scale note, including incoming external MIDI notes. Changing scale after recording a pattern re-interprets existing notes into the new scale rather than transposing them literally.</p>
   </div>
+
 </section>
 
 <section class="tab" id="tab-synth">
