@@ -63,6 +63,12 @@ kbd {
   padding:1px 6px; font-family:inherit; font-weight:700; font-size:0.85em; color:var(--accent2);
 }
 .dim { color:var(--dim); }
+.pack-row { display:flex; align-items:center; gap:8px; margin:12px 0 2px; }
+.pack-row label { font-size:0.72em; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em; flex:0 0 auto; }
+.pack-row select {
+  flex:1; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:9px 12px;
+  color:var(--text); font-size:0.95em; font-weight:600;
+}
 .search-row { display:flex; gap:8px; margin:10px 0; }
 .search-row input {
   flex:1; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px;
@@ -373,7 +379,11 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
 </section>
 
 <section class="tab" id="tab-patches">
-  <h2>Team Novation Ci &mdash; 64 synth patches</h2>
+  <h2 id="patchHeading">Team Novation Ci &mdash; 64 synth patches</h2>
+  <div class="pack-row">
+    <label for="packSelect">Pack</label>
+    <select id="packSelect"><option value="team-novation-ci">loading&hellip;</option></select>
+  </div>
   <div class="search-row"><input id="search" type="search" placeholder="Search patch name&hellip;" autocomplete="off"></div>
   <div class="filter-label">Category</div>
   <div class="chips" id="catChips">
@@ -2382,17 +2392,27 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
 <section class="tab" id="tab-about">
   <h2>About this cheatsheet</h2>
   <div class="box">
-    <p>Single self-contained HTML file &mdash; no server, no app store. All navigation (tabs, patch cards) works from plain CSS/HTML, so it renders correctly even somewhere that won't run JavaScript.</p>
-    <p><b>Getting it into Safari on iPhone</b> (needed for Add to Home Screen): tapping an <code>.html</code> file in Files/Mail/AirDrop usually opens Apple's <b>Quick Look</b> preview, not Safari. From Quick Look, tap the <b>Share</b> icon (square with an arrow) and look for a <b>Safari</b> icon in the row of apps &mdash; tapping it opens the page properly in Safari. From there, tap <b>Share</b> &rarr; <b>Add to Home Screen</b> to launch it full-screen and fully offline afterwards.</p>
+    <p>The page and its <b>default pack</b> are self-contained &mdash; the tabs, the reference content, and the default pack's patch cards all render from plain inline HTML/CSS, with no server and even with JavaScript disabled. Switching to <b>another pack</b> is the one thing that needs more: the page fetches that pack's data from a <code>data/&lt;pack&gt;.json</code> file sitting next to it, which requires the page to be served over http(s) (GitHub Pages, or a local server) with the <code>data/</code> folder alongside. Opened as a bare <code>file://</code> the extra packs won't load &mdash; only the default one.</p>
+    <p><b>Getting it into Safari on iPhone</b> (needed for Add to Home Screen): tapping an <code>.html</code> file in Files/Mail/AirDrop usually opens Apple's <b>Quick Look</b> preview, not Safari. From Quick Look, tap the <b>Share</b> icon (square with an arrow) and look for a <b>Safari</b> icon in the row of apps &mdash; tapping it opens the page properly in Safari. From there, tap <b>Share</b> &rarr; <b>Add to Home Screen</b> to launch it full-screen. The default pack then works fully offline; other packs load while you're online (they aren't cached for offline yet).</p>
     <p>Patch data was reverse-engineered from the Novation Components web editor's client-side code and cross-validated byte-for-byte against Novation's official <i>Circuit Programmer's Reference Guide 1.3</i> (Synth Patch Format table, page 14&ndash;18).</p>
+  </div>
+  <h3>Official Novation resources</h3>
+  <div class="box">
+    <ul class="hw-list">
+      <li><a href="https://components.novationmusic.com/circuit/updates" target="_blank" rel="noopener">What's new &mdash; firmware changelog</a> &mdash; check your firmware version for the v1.7 / v1.8 features noted here</li>
+      <li><a href="https://fael-downloads-prod.focusrite.com/customer/prod/s3fs-public/downloads/Circuit%201.8%20User%20Guide.pdf" target="_blank" rel="noopener">Circuit v1.8 New Features (PDF)</a></li>
+      <li><a href="https://fael-downloads-prod.focusrite.com/customer/prod/s3fs-public/novation/downloads/15909/circuit-v1-7-new-features-addendum.pdf" target="_blank" rel="noopener">Circuit v1.7 New Features (PDF)</a></li>
+      <li><a href="https://fael-downloads-prod.focusrite.com/customer/prod/s3fs-public/novation/downloads/15792/circuit-ug-en-03-v1-6.pdf" target="_blank" rel="noopener">Circuit User Guide v1.6 (PDF)</a></li>
+      <li><a href="https://fael-downloads-prod.focusrite.com/customer/prod/downloads/Circuit%20Programmer%27s%20Reference%20Guide%201.3_2.pdf" target="_blank" rel="noopener">Programmer's Reference Guide 1.3 (PDF)</a></li>
+    </ul>
   </div>
   <h3>Patches</h3>
   <div class="box">
-    <p>Tap a patch to expand its full parameter set. This pack also ships 64 one-shot samples and 32 demo sessions (not covered here &mdash; just audio/session data, nothing to decode).</p>
+    <p>Use the <b>Pack</b> dropdown on the Patches tab to switch between the decoded packs; your last choice is remembered on this device. Tap a patch to expand its full parameter set. (Packs also ship one-shot samples and demo sessions &mdash; not covered here, they're just audio/session data with nothing to decode.)</p>
     <p>The numbered badge on each patch (e.g. <span class="p-num" style="display:inline">01</span>) is its slot 1&ndash;64 in Patch View on the hardware &mdash; stays visible even when filtered, so you always know where to find it. See Workflow &rarr; Shift shortcuts &rarr; Patch &amp; sound for how Patch View is laid out.</p>
   </div>
-  <h3>Regenerating for another pack</h3>
-  <div class="box"><p>This page is generated from a <code>.circuitpack</code> export (rename to <code>.zip</code> and unzip: <code>index.json</code> + <code>patches/*.syx</code>). The same decoder works for any Circuit (product 0x60) factory or user pack &mdash; only the embedded patch JSON below needs regenerating.</p></div>
+  <h3>Regenerating / adding packs</h3>
+  <div class="box"><p>Each pack is a <code>.circuitpack</code> export (a zip: <code>index.json</code> + <code>patches/*.syx</code>). Drop more into <code>packs/</code> and re-run <code>tools/build_packs.py</code> then <code>tools/build_html.py</code> &mdash; the decoder works for any Circuit (product 0x60) factory or user pack. The default pack is inlined for instant load; the rest are fetched from <code>data/&lt;slug&gt;.json</code> when selected.</p></div>
 </section>
 
 </main>
@@ -2400,39 +2420,104 @@ details.deep summary { cursor:pointer; color:var(--accent2); font-size:0.85em; f
 <div class="footer-note">Novation Circuit Cheatsheet &middot; unofficial fan reference &middot; not affiliated with Focusrite/Novation</div>
 
 <script>
+const PACKS = [{"slug": "ali-the-architec", "name": "Ali The Architec", "patchCount": 64}, {"slug": "blankfor-ms", "name": "BlankFor.ms", "patchCount": 64}, {"slug": "factory-circuit", "name": "Factory Circuit", "patchCount": 64}, {"slug": "peak-sample-pack", "name": "Peak Sample Pack", "patchCount": 64}, {"slug": "post-industrial", "name": "Post Industrial", "patchCount": 64}, {"slug": "shawn-rudiman", "name": "Shawn Rudiman", "patchCount": 64}, {"slug": "team-novation-ci", "name": "Team Novation Ci", "patchCount": 64}];
+const DEFAULT_SLUG = "team-novation-ci";
+const LS_KEY = 'circuitPack';
+
 const search = document.getElementById('search');
+const patchList = document.getElementById('patchList');
+const patchHeading = document.getElementById('patchHeading');
+const packSelect = document.getElementById('packSelect');
+const noResults = document.getElementById('noResults');
 
-// Each filter group: chip container id -> { dataKey: card.dataset key, active: current value }
-const filterGroups = [
-  { id: 'catChips', key: 'cat' },
-  { id: 'genreChips', key: 'genre' },
-  { id: 'voiceChips', key: 'voice' },
-].map(g => ({ ...g, active: 'all', chips: document.querySelectorAll('#' + g.id + ' .chip') }));
+// The default pack is rendered inline above; snapshot that DOM so we can switch back to
+// it without a fetch (and offline). chipValues() drops the leading "All" chip so renderPack
+// can re-add it uniformly for every pack.
+function chipValues(id) {
+  return [...document.querySelectorAll('#' + id + ' .chip')].slice(1).map(c => c.outerHTML).join('');
+}
+const cache = { [DEFAULT_SLUG]: {
+  heading: patchHeading.innerHTML,
+  cards: patchList.innerHTML,
+  catChips: chipValues('catChips'),
+  genreChips: chipValues('genreChips'),
+  voiceChips: chipValues('voiceChips'),
+} };
 
+// ---- filtering (rebound whenever the pack's chips are replaced) ----
+let filterGroups = [];
 function applyFilter() {
   const q = search.value.trim().toLowerCase();
   let visible = 0;
-  document.querySelectorAll('#patchList .card').forEach(card => {
+  patchList.querySelectorAll('.card').forEach(card => {
     const matchesText = card.dataset.name.includes(q);
     const matchesGroups = filterGroups.every(g => g.active === 'all' || card.dataset[g.key] === g.active);
     const show = matchesText && matchesGroups;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
-  document.getElementById('noResults').style.display = visible ? 'none' : '';
+  noResults.style.display = visible ? 'none' : '';
 }
-
-search.addEventListener('input', applyFilter);
-filterGroups.forEach(group => {
-  group.chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      group.chips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      group.active = chip.dataset[group.key];
-      applyFilter();
+function initFilters() {
+  filterGroups = [
+    { id: 'catChips', key: 'cat' },
+    { id: 'genreChips', key: 'genre' },
+    { id: 'voiceChips', key: 'voice' },
+  ].map(g => ({ ...g, active: 'all', chips: document.querySelectorAll('#' + g.id + ' .chip') }));
+  filterGroups.forEach(group => {
+    group.chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        group.chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        group.active = chip.dataset[group.key];
+        applyFilter();
+      });
     });
   });
-});
+  applyFilter();
+}
+search.addEventListener('input', applyFilter);
+
+// ---- pack switching ----
+function renderPack(data) {
+  patchHeading.innerHTML = data.heading;
+  document.getElementById('catChips').innerHTML = '<button class="chip active" data-cat="all">All</button>' + data.catChips;
+  document.getElementById('genreChips').innerHTML = '<button class="chip active" data-genre="all">All</button>' + data.genreChips;
+  document.getElementById('voiceChips').innerHTML = '<button class="chip active" data-voice="all">All</button>' + data.voiceChips;
+  patchList.innerHTML = data.cards;
+  search.value = '';
+  initFilters();
+}
+async function loadPack(slug) {
+  let data = cache[slug];
+  if (!data) {
+    try {
+      const res = await fetch('data/' + slug + '.json');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      data = await res.json();
+      cache[slug] = data;
+    } catch (e) {
+      console.warn('Could not load pack', slug, e);
+      packSelect.value = localStorage.getItem(LS_KEY) || DEFAULT_SLUG;
+      return;
+    }
+  }
+  renderPack(data);
+  packSelect.value = slug;
+  localStorage.setItem(LS_KEY, slug);
+}
+
+packSelect.innerHTML = PACKS.map(p =>
+  '<option value="' + p.slug + '">' + p.name + ' (' + p.patchCount + ')</option>'
+).join('');
+packSelect.addEventListener('change', () => loadPack(packSelect.value));
+
+// Default pack is already inline; wire its filters up immediately so it stays interactive
+// even if a later fetch fails. Then, if a different pack was last used, load it.
+packSelect.value = DEFAULT_SLUG;
+initFilters();
+const saved = localStorage.getItem(LS_KEY);
+if (saved && saved !== DEFAULT_SLUG && PACKS.some(p => p.slug === saved)) loadPack(saved);
 </script>
 </body>
 </html>

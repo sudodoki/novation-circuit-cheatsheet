@@ -1,20 +1,20 @@
 # Novation Circuit Cheatsheet
 
-A single self-contained, mobile-friendly HTML page for the original **Novation Circuit** (the 2-synth + 4-drum groovebox, product ID `0x60` — not Circuit Tracks, Circuit Rhythm, or Circuit Mono Station, which use a different patch format).
+A mobile-friendly HTML cheatsheet for the original **Novation Circuit** (the 2-synth + 4-drum groovebox, product ID `0x60` — not Circuit Tracks, Circuit Rhythm, or Circuit Mono Station, which use a different patch format).
 
-No app, no build step to *use* it — `index.html` is the entire thing. Open it, or visit the hosted copy:
+No app, no build step to *use* it. `index.html` plus a `data/` folder of per-pack JSON is all you serve. The page and its default pack are self-contained (render with no server and even without JavaScript); switching to another pack fetches `data/<pack>.json` alongside the page, so the extra packs need it served over http(s) rather than opened as a bare `file://`. Open the hosted copy:
 
 **https://sudodoki.github.io/novation-circuit-cheatsheet/**
 
-On iPhone: open that link in Safari, then **Share → Add to Home Screen** for a full-screen, fully offline icon.
+On iPhone: open that link in Safari, then **Share → Add to Home Screen** for a full-screen icon. The default pack works fully offline; other packs load while you're online.
 
 ## What's in it
 
 - **Workflow** — hardware button map, Shift shortcuts, and how Clear/Duplicate actually work, sourced from Novation's official Circuit User Guide.
 - **Reference** — a parameter reference for the synth engine itself: oscillators, filter, envelopes, LFOs, FX, Mod Matrix, and Macros. Explains what the values shown on the Patches tab mean, not how to press buttons.
-- **Patches** — every patch in a specific factory pack ("Team Novation Ci"), decoded byte-for-byte from the pack's `.syx` dumps: oscillator/filter/envelope/LFO/FX settings, and — per patch — exactly which parameter each of the 8 Macro knobs controls.
+- **Patches** — every patch of a Circuit pack, decoded byte-for-byte from the pack's `.syx` dumps: oscillator/filter/envelope/LFO/FX settings, and — per patch — exactly which parameter each of the 8 Macro knobs controls. A **pack dropdown** switches between all decoded packs; your choice is remembered in `localStorage`. The default pack is baked into the page; the rest load on demand from `data/<slug>.json`.
 
-Tabs and patch cards work via plain CSS/HTML (`<details>` + radio-button tabs), not JavaScript, so they still work in restrictive viewers (e.g. iOS Quick Look). Search and category filtering are JavaScript, layered on top as an enhancement.
+Tabs and the default pack's patch cards work via plain CSS/HTML (`<details>` + radio-button tabs), not JavaScript, so they still render in restrictive viewers (e.g. iOS Quick Look). Search, filtering, and switching packs are JavaScript layered on top as an enhancement.
 
 ## Getting a Circuit pack
 
@@ -30,28 +30,37 @@ Patches are bundled with each pack Novation publishes for the Circuit. To get on
 
 Only `index.json` and `patches/*.syx` are used by this project; samples and sessions aren't decoded (there's nothing to decode — they're just audio/session data).
 
-## Regenerating for a different pack
+## Building & adding packs
+
+Drop one or more `.circuitpack` files into a `packs/` folder, then run from the repo root:
 
 ```bash
-python3 tools/parse_patches.py <path-to-extracted-pack> tools/patches_decoded.json
-python3 tools/build_html.py
+python3 tools/build_packs.py packs   # decode packs/*.circuitpack -> data/<slug>.json + data/packs.json
+python3 tools/build_html.py          # assemble index.html (default pack inlined, others fetched)
 ```
 
-The first command decodes every `.syx` in `<pack>/patches/` into `tools/patches_decoded.json`. The second renders `index.html` from that JSON plus the static Workflow/Reference content in `tools/build_html.py`. Re-run both any time you want to swap in a different pack.
+- `build_packs.py` unzips each `.circuitpack` itself, decodes all its `.syx` patches, pre-renders the patch cards + filter chips to HTML, and writes one `data/<slug>.json` per pack plus a `data/packs.json` manifest (which names the default pack).
+- `build_html.py` reads `data/`, inlines the default pack for instant/offline first paint, and adds the pack dropdown + the small loader that fetches the other packs.
+
+The default pack is `Team Novation Ci` (set via `DEFAULT_PACK_NAME` in `build_packs.py`). Any Circuit (product `0x60`) factory or user pack works; packs that fail to decode are skipped with a warning. The `packs/` inputs are gitignored — they're Novation's copyrighted content (see below).
 
 ## Project structure
 
 ```
-index.html                    the published page — the only file you need to view it
-tools/parse_patches.py        decodes Circuit .syx patch dumps to JSON
-tools/build_html.py           renders index.html from the decoded JSON
+index.html               the published page (generated)
+data/                    generated per-pack JSON + packs.json (runtime assets — deploy these)
+tools/
+  parse_patches.py       decodes Circuit .syx patch dumps to a dict
+  render.py              shared patch-card / chip HTML rendering
+  build_packs.py         decodes all packs -> data/*.json
+  build_html.py          assembles index.html from data/
 ```
 
-`tools/patches_decoded.json` and the raw pack files (`.circuitpack`/`.zip`/`extracted/`) are gitignored — they're regenerated locally from a pack you download yourself, not redistributed here (see below).
+`index.html` and `data/*.json` are the deployed artifacts and **must be committed** (the page fetches `data/` at runtime).
 
-## Why the pack itself isn't in this repo
+## Why the raw packs aren't in this repo
 
-The samples, patch data, and sessions inside a Circuit pack are Novation's copyrighted content. This repo only publishes the *numeric parameter values* extracted from patches (needed to build a readable reference table) and the decoder source — not the original `.syx`/`.wav`/`.circuitsession` files. Download a pack yourself from Novation Components if you want to regenerate or extend this.
+The samples, patch data, and sessions inside a Circuit pack are Novation's copyrighted content. This repo publishes only the *numeric parameter values* extracted from patches (as `data/*.json`, needed to build the readable reference) and the decoder source — not the original `.circuitpack`/`.syx`/`.wav`/`.circuitsession` files. Download packs yourself from Novation Components to regenerate or extend this.
 
 ## How the byte format was figured out
 

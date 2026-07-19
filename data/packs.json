@@ -1,0 +1,40 @@
+{
+  "defaultSlug": "team-novation-ci",
+  "packs": [
+    {
+      "slug": "ali-the-architec",
+      "name": "Ali The Architec",
+      "patchCount": 64
+    },
+    {
+      "slug": "blankfor-ms",
+      "name": "BlankFor.ms",
+      "patchCount": 64
+    },
+    {
+      "slug": "factory-circuit",
+      "name": "Factory Circuit",
+      "patchCount": 64
+    },
+    {
+      "slug": "peak-sample-pack",
+      "name": "Peak Sample Pack",
+      "patchCount": 64
+    },
+    {
+      "slug": "post-industrial",
+      "name": "Post Industrial",
+      "patchCount": 64
+    },
+    {
+      "slug": "shawn-rudiman",
+      "name": "Shawn Rudiman",
+      "patchCount": 64
+    },
+    {
+      "slug": "team-novation-ci",
+      "name": "Team Novation Ci",
+      "patchCount": 64
+    }
+  ]
+}

@@ -290,8 +290,9 @@ def parse_patch(raw: bytes, patch_name_hint=None):
     }
 
 
-def main():
-    pack_dir = Path(sys.argv[1] if len(sys.argv) > 1 else "extracted")
+def decode_pack(pack_dir):
+    """Decode an extracted .circuitpack directory (index.json + patches/*.syx) into a dict."""
+    pack_dir = Path(pack_dir)
     index = json.loads((pack_dir / "index.json").read_text())
 
     patches = []
@@ -323,16 +324,33 @@ def main():
 
         patches.append(decoded)
 
-    out = {
+    return {
         "packName": index["name"],
         "product": index["product"],
         "patches": patches,
         "samples": [s["name"] for s in index.get("samples", [])],
         "sessions": [s["name"] for s in index.get("sessions", [])],
     }
+
+
+def decode_circuitpack(circuitpack_path):
+    """Extract a .circuitpack (zip) to a temp dir and decode it. Returns the same dict as decode_pack."""
+    import tempfile
+    import zipfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with zipfile.ZipFile(circuitpack_path) as zf:
+            zf.extractall(tmp)
+        return decode_pack(tmp)
+
+
+def main():
+    if len(sys.argv) < 2:
+        sys.exit("Usage: python3 tools/parse_patches.py <extracted-pack-dir> [out.json]")
+    out = decode_pack(Path(sys.argv[1]).expanduser())
     out_path = Path(sys.argv[2] if len(sys.argv) > 2 else "patches_decoded.json")
     out_path.write_text(json.dumps(out, indent=2))
-    print(f"Wrote {len(patches)} patches to {out_path}")
+    print(f"Wrote {len(out['patches'])} patches to {out_path}")
 
 
 if __name__ == "__main__":
