@@ -282,6 +282,7 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
       <tr><td><kbd>Shift</kbd>+<kbd>Drum 1&ndash;4</kbd></td><td>Change patch for that drum track</td></tr>
       <tr><td><kbd>Shift</kbd>+ pad (in Patch View)</td><td>Disable audition/preview when browsing patches</td></tr>
     </table>
+    <p class="dim">Pressing plain <kbd>Drum 1</kbd>/<kbd>2</kbd>/<kbd>3</kbd>/<kbd>4</kbd> (no Shift) selects which single drum track is active for editing. This matters for Macros: each Macro knob's function is fixed but <b>shared</b> between two drum tracks (1&amp;3, or 2&amp;4) &mdash; it affects whichever one of that pair is currently selected, not both. See Reference &rarr; Drum Macros for the full fixed mapping (pitch/decay/distortion/filter).</p>
     <h3>Tempo, save &amp; system</h3>
     <table>
       <tr><td><kbd>Shift</kbd>+<kbd>Tempo</kbd> (tap in time)</td><td>Tap Tempo</td></tr>
@@ -420,9 +421,24 @@ details.deep summary {{ cursor:pointer; color:var(--accent2); font-size:0.85em; 
     </div>
   </div>
 
-  <h3>Macros (8 knobs)</h3>
+  <h3>Synth Macros (8 knobs)</h3>
   <div class="box">
     <p>Each Macro knob can drive up to <b>4 simultaneous destinations</b> (A&ndash;D), each with its own <b>Start</b>/<b>End</b> range (which portion of the knob's 0&ndash;127 travel is used) and signed <b>Depth</b>. Macros use a bigger, separate destination catalogue than the Mod Matrix &mdash; 71 targets in total (index 0 = "No Destination"): every oscillator/mixer/filter/envelope/LFO/FX parameter individually, plus the ability to drive the <b>depth</b> of any of the 20 Mod Matrix slots directly (meta-modulation). This list isn't in Novation's published manuals; it was read directly out of the Novation Components web editor's Modulation-tab destination dropdown.</p>
+    <p>This per-patch, freely-assignable behaviour is what's decoded on the Patches tab. It only applies to <b>synth</b> patches &mdash; drum tracks work completely differently, see below.</p>
+  </div>
+
+  <h3>Drum Macros (fixed)</h3>
+  <div class="box">
+    <p>Unlike synth patches, the drum macro <b>functions are fixed in hardware</b> &mdash; identical for every drum sample loaded; only the sonic result changes. There's no per-patch assignment to decode, which is why drum samples aren't covered on the Patches tab (they're just <code>.wav</code> audio, nothing to decode).</p>
+    <p>Drum tracks are handled in pairs, so each Macro knob is <b>shared</b> by two tracks &mdash; it controls whichever <i>one</i> of the pair is currently selected (via the Drum 1/2/3/4 track buttons), not both at the same time. Odd-numbered knobs (1, 3, 5, 7) are shared between <b>Drum 1 and 3</b>; even-numbered knobs (2, 4, 6, 8) are shared between <b>Drum 2 and 4</b>. Switch which drum is selected to move the same knob's effect to the other track in its pair.</p>
+    <table>
+      <tr><th>Function</th><th>Drums 1 &amp; 3</th><th>Drums 2 &amp; 4</th></tr>
+      <tr><td>Static pitch</td><td>Macro 1</td><td>Macro 2</td></tr>
+      <tr><td>Decay envelope time</td><td>Macro 3</td><td>Macro 4</td></tr>
+      <tr><td>Distortion</td><td>Macro 5</td><td>Macro 6</td></tr>
+      <tr><td>Filter</td><td>Macro 7</td><td>Macro 8</td></tr>
+    </table>
+    <p class="dim">Turning Macro 3/4 fully clockwise makes the decay envelope unlimited, playing the full sample duration &mdash; useful for sample loops or long one-shots. Hold <kbd>Clear</kbd> and turn a Macro knob clockwise ~20% to reset it to the sample's default (LED flashes blue).</p>
   </div>
 
   <h3>Scales (16)</h3>
